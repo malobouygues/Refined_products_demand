@@ -44,7 +44,9 @@ def dataset(region):
     for name, s in predictors(region).items():
         s = s.dropna().rename(name).reset_index()
         s["available_at"] = s["period_end"] + pd.offsets.MonthEnd(c.LAG[name])
-        df = pd.merge_asof(df, s[["available_at", name]].sort_values("available_at"),
-                           left_on="month_end", right_on="available_at", direction="backward",
-                           tolerance=pd.Timedelta(days=c.STALE_DAYS)).drop(columns="available_at")
+        s = s.sort_values("available_at")
+        df = pd.merge_asof(df, s[["available_at", name]], left_on="month_end",
+                           right_on="available_at", direction="backward",
+                           tolerance=pd.Timedelta(days=c.STALE_DAYS))
+        df = df.drop(columns="available_at")
     return df.drop(columns="month_end").set_index("month")

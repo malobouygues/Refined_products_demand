@@ -32,11 +32,9 @@ def get(url):
 
 def jodi():
     """Monthly demand by product and country, 650 MB of csv that sql.py queries in place."""
-    archive = c.DATA / "jodi_secondary.zip"
-    if not archive.exists():
-        archive.write_bytes(get("https://www.jodidata.org/_resources/files/downloads/oil-data/"
-                                "world_Secondary_CSV.zip"))
-    with zipfile.ZipFile(archive) as z:
+    archive = get("https://www.jodidata.org/_resources/files/downloads/oil-data/"
+                  "world_Secondary_CSV.zip")
+    with zipfile.ZipFile(io.BytesIO(archive)) as z:
         (c.DATA / "jodi_secondary.csv").write_bytes(z.read(z.namelist()[0]))
 
 
@@ -71,9 +69,10 @@ def cpb():
     book = pd.read_excel(io.BytesIO(get("https://www.cpb.nl" + href)), sheet_name="trade_out",
                          header=None)
     months = book.iloc[3, 5:].astype(str).str.replace("m", "-")
-    trade = book[book[1] == "World trade"].iloc[0, 5:].astype(float)
-    pd.DataFrame({"month": months.to_numpy(), "wtr": trade.to_numpy()}).to_csv(
-        c.DATA / "cpb_world_trade.csv", index=False)
+    # by series code: the label "World trade" is on the price row as well as the volume row
+    volume = book[book[2] == "tgz_w1_qnmi_sn"].iloc[0, 5:].astype(float)
+    df = pd.DataFrame({"month": months.to_numpy(), "wtr": volume.to_numpy()})
+    df.to_csv(c.DATA / "cpb_world_trade.csv", index=False)
 
 
 SOURCES = {"jodi": jodi, "fred": fred, "ember": ember, "worldbank": worldbank, "cpb": cpb}
