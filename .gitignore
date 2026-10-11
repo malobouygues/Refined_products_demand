@@ -7,9 +7,5 @@ __pycache__/
 .venv/
 .ipynb_checkpoints/
 
-# JODI and Ember (too large to commit)
-data/jodi_secondary.*
-data/ember_yearly.csv
-
 # en attendant
 README copy.md

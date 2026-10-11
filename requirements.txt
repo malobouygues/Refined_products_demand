@@ -5,4 +5,5 @@ matplotlib
 xgboost
 scikit-learn      # XGBRegressor is XGBoost's sklearn-compatible estimator and needs it
 openpyxl          # the CPB world trade monitor is only published as .xlsx
+xlrd              # EIA history files are old-format .xls
 jupyterlab        # to run the two notebooks
